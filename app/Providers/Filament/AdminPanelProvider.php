@@ -17,6 +17,9 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use App\Filament\Admin\Widgets\TopCompanyChart;
+use App\Filament\Admin\Widgets\SalaryChart;
+use App\Filament\Admin\Widgets\ExperienceChart;
 
 class AdminPanelProvider extends PanelProvider
 {
