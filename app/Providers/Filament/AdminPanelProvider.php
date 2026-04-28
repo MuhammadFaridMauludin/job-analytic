@@ -21,6 +21,7 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class AdminPanelProvider extends PanelProvider
 {
+    
     public function panel(Panel $panel): Panel
     {
         return $panel
@@ -30,7 +31,7 @@ class AdminPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Blue,
             ])
-
+            
             ->renderHook(
                 'panels::head.end',
                 fn () => Blade::render('
@@ -125,7 +126,7 @@ class AdminPanelProvider extends PanelProvider
 
                         /* topbar */
                         .fi-topbar {
-                            background-color: #060a10 !important;
+                            background-color: #080c14 !important;
                             border-bottom: 1px solid #111827 !important;
                         }
 
@@ -193,8 +194,21 @@ class AdminPanelProvider extends PanelProvider
                         .fi-ta-row { border-bottom: 1px solid #0f1724 !important; }
                     </style>
                 ')
-            )
+            ) 
 
+            ->brandLogo(fn () => view('filament.brand'))
+            // ->renderHook(
+            //     'panels::topbar.end',
+            //     fn () => view('filament.topbar-right')
+            // )
+            // ->renderHook(
+            //     'panels::header.start',
+            //     fn () => view('filament.topbar-right')
+            // )
+            // ->renderHook(
+            //     'panels::sidebar.footer',
+            //     fn () => view('filament.sidebar-footer')
+            // )
             ->discoverResources(in: app_path('Filament/Admin/Resources'), for: 'App\\Filament\\Admin\\Resources')
             ->discoverPages(in: app_path('Filament/Admin/Pages'), for: 'App\\Filament\\Admin\\Pages')
             ->pages([
