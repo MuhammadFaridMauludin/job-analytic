@@ -8,44 +8,41 @@ use Illuminate\Support\Facades\DB;
 class TopCompanyChart extends ChartWidget
 {
     protected static ?string $heading = 'Top 10 Companies';
-    protected static ?int $sort = 1;
+    protected static ?string $description = 'Perusahaan dengan jumlah lowongan IT terbanyak';
+    protected static ?int $sort = 2;
+
     protected int | string | array $columnSpan = 'full';
+    protected static ?string $maxHeight = '360px';
 
     protected function getData(): array
     {
         $data = DB::table('jobs_clean')
             ->select('company', DB::raw('COUNT(*) as total'))
+            ->whereNotNull('company')
+            ->where('company', '!=', '')
             ->groupBy('company')
             ->orderByDesc('total')
             ->limit(10)
             ->get();
 
-        $colors = [
-            'rgba(99, 102, 241, 0.85)',
-            'rgba(139, 92, 246, 0.85)',
-            'rgba(236, 72, 153, 0.85)',
-            'rgba(59, 130, 246, 0.85)',
-            'rgba(16, 185, 129, 0.85)',
-            'rgba(245, 158, 11, 0.85)',
-            'rgba(239, 68, 68, 0.85)',
-            'rgba(20, 184, 166, 0.85)',
-            'rgba(249, 115, 22, 0.85)',
-            'rgba(168, 85, 247, 0.85)',
-        ];
+        $count  = $data->count();
+        $colors = collect(range(0, $count - 1))->map(function ($i) use ($count) {
+            $alpha = round(0.85 - ($i / $count) * 0.45, 2);
+            return "rgba(59, 130, 246, {$alpha})";
+        })->toArray();
 
         return [
             'datasets' => [
                 [
-                    'label' => 'Job Listings',
-                    'data' => $data->pluck('total'),
+                    'label'           => 'Jumlah Lowongan',
+                    'data'            => $data->pluck('total')->toArray(),
                     'backgroundColor' => $colors,
-                    'borderColor' => array_map(fn($c) => str_replace('0.85', '1', $c), $colors),
-                    'borderWidth' => 2,
-                    'borderRadius' => 6,
-                    'borderSkipped' => false,
+                    'borderWidth'     => 0,
+                    'borderRadius'    => 4,
+                    'borderSkipped'   => false,
                 ],
             ],
-            'labels' => $data->pluck('company')->map(fn($name) => \Illuminate\Support\Str::limit($name, 20)),
+            'labels' => $data->pluck('company')->toArray(),
         ];
     }
 
@@ -57,31 +54,24 @@ class TopCompanyChart extends ChartWidget
     protected function getOptions(): array
     {
         return [
-            'plugins' => [
-                'legend' => ['display' => false],
+            'indexAxis' => 'y',
+            'plugins'   => [
+                'legend'  => ['display' => false],
                 'tooltip' => [
-                    'callbacks' => [],
+                    'callbacks' => [
+                        'label' => "function(ctx){ return '  ' + ctx.parsed.x + ' lowongan'; }",
+                    ],
                 ],
             ],
             'scales' => [
-                'y' => [
-                    'beginAtZero' => true,
-                    'grid' => [
-                        'color' => 'rgba(255,255,255,0.05)',
-                    ],
-                    'ticks' => [
-                        'stepSize' => 5,
-                        'color' => 'rgba(255,255,255,0.5)',
-                    ],
-                ],
                 'x' => [
-                    'grid' => [
-                        'display' => false,
-                    ],
-                    'ticks' => [
-                        'color' => 'rgba(255,255,255,0.7)',
-                        'font' => ['size' => 10],
-                    ],
+                    'beginAtZero' => true,
+                    'grid'        => ['color' => '#0f1724'],
+                    'ticks'       => ['color' => '#475569'],
+                ],
+                'y' => [
+                    'grid'  => ['display' => false],
+                    'ticks' => ['color' => '#94a3b8', 'font' => ['size' => 12]],
                 ],
             ],
             'maintainAspectRatio' => false,

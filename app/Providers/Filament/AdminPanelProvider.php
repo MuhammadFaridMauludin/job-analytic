@@ -2,14 +2,13 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Admin\Pages\Dashboard;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
-use Filament\View\PanelsRenderHook;
 use Filament\Widgets;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -19,11 +18,6 @@ use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
-use App\Filament\Admin\Widgets\TopCompanyChart;
-use App\Filament\Admin\Widgets\SalaryChart;
-use App\Filament\Admin\Widgets\ExperienceChart;
-use Filament\Navigation\MenuItem;
-use Illuminate\Support\Facades\Auth;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -36,128 +30,179 @@ class AdminPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Blue,
             ])
-            ->darkMode(false)
-            ->brandName('Job-Analytic')
-            // css sidebar
-->renderHook(
-    'panels::head.end',
-    fn () => Blade::render('
-        <style>
-            /* bg */
-            .fi-sidebar {
-                background-color: #1f2937 !important;
-                border-right: 1px solid rgba(255,255,255,0.05) !important;
-            }
 
-            .fi-sidebar-header {
-                background: #1f2937 !important;
-                border-bottom: 1px solid rgba(255,255,255,0.05) !important;
-                justify-content: center !important;
-            }
+            ->renderHook(
+                'panels::head.end',
+                fn () => Blade::render('
+                    <style>
+                        /* bg */
+                        body,
+                        .fi-body,
+                        .fi-layout,
+                        .fi-main,
+                        .fi-page,
+                        .fi-dashboard-page,
+                        .fi-simple-layout {
+                            background-color: #080c14 !important;
+                        }
 
-            /* brand */
-            .fi-sidebar-header *,
-            .fi-brand-name {
-                color: #ffffff !important;
-                text-align: center !important;
-            }
+                        /* konten */
+                        .fi-main-ctn {
+                            padding: 0 !important;
+                        }
 
-            .fi-sidebar-nav-groups {
-                margin-left: 0 !important;
-                margin-right: 0 !important;
-            }
+                        .fi-page-header {
+                            padding: 12px 20px 0 !important;
+                        }
 
-            /* menu off */
-            .fi-sidebar-item-button {
-                color: #ffffff !important;
-                border-radius: 12px !important;
-                transition: all 0.2s ease;
-            }
+                        .fi-dashboard-page .fi-wi-stats-overview,
+                        .fi-page .fi-widgets-container {
+                            padding: 16px 20px !important;
+                            gap: 12px !important;
+                        }
 
-            .fi-sidebar-item-button .fi-sidebar-item-icon {
-                color: #ffffff !important;
-            }
+                        .fi-widgets-container {
+                            gap: 12px !important;
+                            padding: 16px 20px 20px !important;
+                        }
 
-            .fi-sidebar-item-button .fi-sidebar-item-label {
-                color: #ffffff !important;
-            }
+                        /* sidebar */
+                        .fi-sidebar {
+                            background-color: #060a10 !important;
+                            border-right: 1px solid #111827 !important;
+                        }
 
-            /* override tailwind */
-            .fi-sidebar-item-button .text-gray-700,
-            .fi-sidebar-item-button .dark\:text-gray-200,
-            .fi-sidebar-item-button .text-gray-400,
-            .fi-sidebar-item-button .dark\:text-gray-500 {
-                color: #ffffff !important;
-            }
+                        .fi-sidebar-header {
+                            background-color: #060a10 !important;
+                            border-bottom: 1px solid #111827 !important;
+                            padding: 14px 16px !important;
+                        }
 
-            /* hover */
-            .fi-sidebar-item-button:hover,
-            .fi-sidebar-item-button.hover\:bg-gray-100:hover {
-                background-color: rgba(255,255,255,0.08) !important;
-            }
+                        .fi-sidebar-header .fi-logo,
+                        .fi-sidebar-header a,
+                        .fi-sidebar-header span {
+                            color: #f1f5f9 !important;
+                            font-weight: 700 !important;
+                            font-size: 13px !important;
+                            line-height: 1.35 !important;
+                        }
 
-            /* menu on */
-            .fi-sidebar-item-active .fi-sidebar-item-button,
-            .fi-sidebar-item-button.bg-gray-100 {
-                background-color: #ffffff !important;
-                border-radius: 12px !important;
-                width: 100% !important;
-                margin: 0 !important;
-                padding-left: 12px !important;
-                padding-right: 12px !important;
-            }
+                        /* Nav */
+                        .fi-sidebar-nav-groups .fi-sidebar-item-button {
+                            color: #64748b !important;
+                            border-radius: 0 !important;
+                            border-left: 2px solid transparent !important;
+                            margin: 0 !important;
+                            padding: 8px 16px !important;
+                            font-size: 13px !important;
+                        }
 
-            /* icon, teks aktif */
-            .fi-sidebar-item-active .fi-sidebar-item-icon,
-            .fi-sidebar-item-active .fi-sidebar-item-label,
-            .fi-sidebar-item-active .text-primary-600,
-            .fi-sidebar-item-button.bg-gray-100 .fi-sidebar-item-icon,
-            .fi-sidebar-item-button.bg-gray-100 .fi-sidebar-item-label,
-            .fi-sidebar-item-button .text-primary-600,
-            .fi-sidebar-item-button .dark\:text-primary-400 {
-                color: #206bc4 !important;
-            }
+                        .fi-sidebar-nav-groups .fi-sidebar-item-button:hover {
+                            background-color: #0d1420 !important;
+                            color: #94a3b8 !important;
+                        }
 
-            /* topbar */
-            .fi-topbar {
-                background-color: #ffffff !important;
-                border-bottom: 1px solid #e5e7eb !important;
-            }
+                        .fi-sidebar-nav-groups .fi-sidebar-item-button.fi-active {
+                            background-color: #0d1829 !important;
+                            color: #60a5fa !important;
+                            border-left: 2px solid #3b82f6 !important;
+                            font-weight: 500 !important;
+                        }
 
-            /* bg konten */
-            .fi-main {
-                background-color: #f9fafb !important;
-            }
+                        .fi-sidebar-group-label {
+                            color: #334155 !important;
+                            font-size: 10px !important;
+                            letter-spacing: 1px !important;
+                            text-transform: uppercase !important;
+                            font-weight: 600 !important;
+                            padding: 10px 16px 4px !important;
+                        }
 
-            /* card */
-            .fi-card {
-                background: #ffffff !important;
-                border-radius: 12px !important;
-                border: 1px solid #e5e7eb !important;
-                box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;
-            }
+                        .fi-sidebar-footer {
+                            background-color: #060a10 !important;
+                            border-top: 1px solid #111827 !important;
+                        }
 
-            body {
-                color: #111827 !important;
-            }
-        </style>
-    ')
-)
+                        /* topbar */
+                        .fi-topbar {
+                            background-color: #060a10 !important;
+                            border-bottom: 1px solid #111827 !important;
+                        }
+
+                        /* widgets card */
+                        .fi-wi-chart,
+                        .fi-wi-stats-overview,
+                        .fi-wi-table {
+                            background-color: #0d1420 !important;
+                            border: 1px solid #111827 !important;
+                            border-radius: 10px !important;
+                        }
+
+                        .fi-wi-chart-header-heading,
+                        .fi-section-header-heading {
+                            color: #e2e8f0 !important;
+                            font-size: 13px !important;
+                            font-weight: 600 !important;
+                        }
+
+                        .fi-wi-chart-header-description,
+                        .fi-section-header-description {
+                            color: #475569 !important;
+                            font-size: 11px !important;
+                        }
+
+                        /* stat overview */
+                        .fi-wi-stats-overview-stat {
+                            background-color: #0d1420 !important;
+                            border: 1px solid #111827 !important;
+                            border-radius: 10px !important;
+                            padding: 16px 18px !important;
+                        }
+
+                        .fi-wi-stats-overview-stat-label {
+                            color: #475569 !important;
+                            font-size: 10.5px !important;
+                            font-weight: 500 !important;
+                            text-transform: uppercase !important;
+                            letter-spacing: 0.7px !important;
+                        }
+
+                        .fi-wi-stats-overview-stat-value {
+                            color: #f1f5f9 !important;
+                            font-size: 28px !important;
+                            font-weight: 700 !important;
+                            line-height: 1.1 !important;
+                        }
+
+                        .fi-wi-stats-overview-stat-description {
+                            color: #475569 !important;
+                            font-size: 11px !important;
+                        }
+
+                        /* tabel */
+                        .fi-ta-table { background-color: #0d1420 !important; }
+                        .fi-ta-header-cell {
+                            background-color: #0d1420 !important;
+                            color: #475569 !important;
+                            font-size: 10.5px !important;
+                            text-transform: uppercase !important;
+                            letter-spacing: 0.6px !important;
+                            border-bottom: 1px solid #111827 !important;
+                        }
+                        .fi-ta-cell { color: #94a3b8 !important; font-size: 12px !important; }
+                        .fi-ta-row { border-bottom: 1px solid #0f1724 !important; }
+                    </style>
+                ')
+            )
 
             ->discoverResources(in: app_path('Filament/Admin/Resources'), for: 'App\\Filament\\Admin\\Resources')
             ->discoverPages(in: app_path('Filament/Admin/Pages'), for: 'App\\Filament\\Admin\\Pages')
             ->pages([
-                Pages\Dashboard::class,
+                Dashboard::class, 
             ])
             ->discoverWidgets(in: app_path('Filament/Admin/Widgets'), for: 'App\\Filament\\Admin\\Widgets')
             ->widgets([
-                Widgets\AccountWidget::class,
-                Widgets\FilamentInfoWidget::class,
             ])
-            ->renderHook(
-                    'panels::sidebar.footer',
-                    fn () => view('filament.sidebar-footer')
-                )
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
@@ -172,6 +217,5 @@ class AdminPanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
             ]);
-            
     }
 }

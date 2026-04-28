@@ -8,50 +8,70 @@ use Illuminate\Support\Facades\DB;
 class ExperienceChart extends ChartWidget
 {
     protected static ?string $heading = 'Experience Level Distribution';
-    protected static ?int $sort = 3;
+    protected static ?string $description = 'Proporsi lowongan berdasarkan level pengalaman';
+    protected static ?int $sort = 4;
+
+    // Berdampingan dengan SalaryChart
+    protected int | string | array $columnSpan = 6;
+    protected static ?string $maxHeight = '300px';
 
     protected function getData(): array
     {
         $data = DB::table('jobs_clean')
             ->select('experience_level', DB::raw('COUNT(*) as total'))
             ->whereNotNull('experience_level')
+            ->where('experience_level', '!=', '')
             ->groupBy('experience_level')
+            ->orderByDesc('total')
             ->get();
 
         return [
             'datasets' => [
                 [
-                    'data' => $data->pluck('total'),
+                    'data'            => $data->pluck('total')->toArray(),
                     'backgroundColor' => [
-                        'rgba(99, 102, 241, 0.85)',
-                        'rgba(16, 185, 129, 0.85)',
-                        'rgba(245, 158, 11, 0.85)',
-                        'rgba(239, 68, 68, 0.85)',
-                        'rgba(139, 92, 246, 0.85)',
+                        '#3b82f6',
+                        '#8b5cf6',
+                        '#10b981',
+                        '#f59e0b',
+                        '#f87171',
+                        '#334155',
                     ],
-                    'borderWidth' => 2,
-                    'hoverOffset' => 8,
+                    'borderWidth' => 0,
+                    'hoverOffset' => 6,
                 ],
             ],
-            'labels' => $data->pluck('experience_level'),
+            'labels' => $data->pluck('experience_level')->toArray(),
         ];
     }
 
     protected function getType(): string
     {
-        return 'pie';
+        return 'doughnut';
     }
 
     protected function getOptions(): array
     {
         return [
+            'cutout'  => '68%',
             'plugins' => [
                 'legend' => [
                     'position' => 'bottom',
-                    'labels' => [
-                        'color' => 'rgba(255,255,255,0.7)',
-                        'padding' => 16,
-                        'font' => ['size' => 12],
+                    'labels'   => [
+                        'padding'         => 14,
+                        'usePointStyle'   => true,
+                        'pointStyleWidth' => 8,
+                        'color'           => '#64748b',
+                        'font'            => ['size' => 11],
+                    ],
+                ],
+                'tooltip' => [
+                    'callbacks' => [
+                        'label' => "function(ctx){
+                            var total = ctx.dataset.data.reduce(function(a,b){return a+b;},0);
+                            var pct = ((ctx.parsed / total)*100).toFixed(1);
+                            return '  ' + ctx.label + ': ' + ctx.formattedValue + ' (' + pct + '%)';
+                        }",
                     ],
                 ],
             ],
