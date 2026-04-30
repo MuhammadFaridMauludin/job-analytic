@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 class CategoryDonutChart extends ChartWidget
 {
     protected static ?string $heading = 'Kategori Bidang IT';
+    protected static ?string $description = 'Jumlah lowongan IT';
     protected static ?int $sort = 3;
 
     protected int | string | array $columnSpan = 4;

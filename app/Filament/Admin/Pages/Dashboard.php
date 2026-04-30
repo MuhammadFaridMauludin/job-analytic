@@ -9,6 +9,7 @@ use App\Filament\Admin\Widgets\TopCompanyChart;
 use App\Filament\Admin\Widgets\SalaryChart;
 use App\Filament\Admin\Widgets\ExperienceChart;
 use App\Filament\Admin\Widgets\TopSkillsChart;
+use App\Filament\Admin\Widgets\TopCityChart;
 use Filament\Pages\Dashboard as BaseDashboard;
 
 class Dashboard extends BaseDashboard
@@ -35,12 +36,14 @@ class Dashboard extends BaseDashboard
             CategoryDonutChart::class, //4
 
             // Row 3
-            TopCompanyChart::class,
             TopSkillsChart::class,
+            TopCompanyChart::class,
 
             // Row 4
             SalaryChart::class, //6
             ExperienceChart::class, //6
+            
+            TopCityChart::class,
         ];
     }
 }
