@@ -22,50 +22,46 @@ class SalaryChart extends ChartWidget
             ->where('salary_min', '>', 0)
             ->groupBy('keyword')
             ->orderByDesc('avg_salary')
-            ->limit(10)
+            ->limit(8)
             ->get();
 
         $salaryInMillions = $data->map(fn ($row) => round($row->avg_salary / 1_000_000, 1));
 
-        $colors = [
-            '#3b82f6','#6366f1','#8b5cf6','#a855f7','#ec4899',
-            '#f43f5e','#f97316','#f59e0b','#10b981','#06b6d4',
-        ];
-
         return [
             'datasets' => [
                 [
-                    'label'                => 'Avg Salary (juta Rp)',
-                    'data'                 => $salaryInMillions->toArray(),
-                    'backgroundColor'      => array_slice($colors, 0, $data->count()),
-                    'borderWidth'          => 0,
-                    'borderRadius'         => 8,
-                    'borderSkipped'        => false,
-                    'barPercentage'        => 0.75,
-                    'categoryPercentage'   => 0.85,
+                    'label'           => 'Avg Salary (juta Rp)',
+                    'data'            => $salaryInMillions->toArray(),
+                    'backgroundColor' => 'rgba(99, 102, 241, 0.2)',
+                    'borderColor'     => '#6366f1',
+                    'borderWidth'     => 2,
+                    'pointBackgroundColor' => '#6366f1',
+                    'pointBorderColor'     => '#fff',
+                    'pointHoverBackgroundColor' => '#fff',
+                    'pointHoverBorderColor'     => '#6366f1',
+                    'pointRadius'     => 4,
                 ],
             ],
             'labels' => $data->pluck('keyword')
-                ->map(fn ($n) => \Illuminate\Support\Str::limit($n, 13))
+                ->map(fn ($n) => \Illuminate\Support\Str::limit($n, 15))
                 ->toArray(),
         ];
     }
 
     protected function getType(): string
     {
-        return 'bar';
+        return 'radar';
     }
 
     protected function getOptions(): array
     {
         return [
-            'indexAxis'   => 'y',   // ✅ horizontal seperti TopSkillsChart
             'interaction' => [
                 'mode'      => 'nearest',
-                'intersect' => true,
+                'intersect' => false,
             ],
             'plugins' => [
-                'legend'  => ['display' => false],
+                'legend' => ['display' => false],
                 'tooltip' => [
                     'enabled'         => true,
                     'backgroundColor' => '#1e293b',
@@ -74,30 +70,23 @@ class SalaryChart extends ChartWidget
                     'borderColor'     => '#334155',
                     'borderWidth'     => 1,
                     'padding'         => 12,
-                    'displayColors'   => true,
+                    'displayColors'   => false,
                 ],
             ],
             'scales' => [
-                'x' => [
-                    'beginAtZero' => true,
-                    'grid'        => [
-                        'color'   => 'rgba(255,255,255,0.04)',
-                        'display' => true,
+                'r' => [
+                    'beginAtZero'     => true,
+                    'grid'            => ['color' => 'rgba(255,255,255,0.06)'],
+                    'angleLines'      => ['color' => 'rgba(255,255,255,0.06)'],
+                    'pointLabels'     => [
+                        'color' => '#94a3b8',
+                        'font'  => ['size' => 10],
                     ],
                     'ticks' => [
-                        'color'     => '#64748b',
-                        'font'      => ['size' => 11],
-                        'precision' => 1,
+                        'color'           => '#475569',
+                        'backdropColor'   => 'transparent',
+                        'font'            => ['size' => 9],
                     ],
-                    'border' => ['display' => false],
-                ],
-                'y' => [
-                    'grid'   => ['display' => false],
-                    'ticks'  => [
-                        'color' => '#e2e8f0',
-                        'font'  => ['size' => 12],
-                    ],
-                    'border' => ['display' => false],
                 ],
             ],
             'maintainAspectRatio' => false,

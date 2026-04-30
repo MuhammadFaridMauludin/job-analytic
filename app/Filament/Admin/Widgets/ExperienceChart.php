@@ -26,30 +26,26 @@ class ExperienceChart extends ChartWidget
 
         if ($data->isEmpty()) {
             return [
-                'datasets' => [
-                    [
-                        'data'            => [40, 30, 20, 10],
-                        'backgroundColor' => ['#3b82f6','#8b5cf6','#10b981','#f59e0b'],
-                        'borderWidth'     => 0,
-                        'hoverOffset'     => 4,
-                    ],
-                ],
+                'datasets' => [[
+                    'data'            => [40, 30, 20, 10],
+                    'backgroundColor' => ['#3b82f6','#8b5cf6','#10b981','#f59e0b'],
+                    'borderWidth'     => 0,
+                    'hoverOffset'     => 4,
+                ]],
                 'labels' => ['Junior','Mid','Senior','Lead'],
             ];
         }
 
         return [
-            'datasets' => [
-                [
-                    'data'            => $data->pluck('total')->toArray(),
-                    'backgroundColor' => [
-                        '#3b82f6','#8b5cf6','#10b981',
-                        '#f59e0b','#f87171','#334155',
-                    ],
-                    'borderWidth' => 0,
-                    'hoverOffset' => 4,
+            'datasets' => [[
+                'data'            => $data->pluck('total')->toArray(),
+                'backgroundColor' => [
+                    '#3b82f6','#8b5cf6','#10b981',
+                    '#f59e0b','#f87171','#334155',
                 ],
-            ],
+                'borderWidth' => 0,
+                'hoverOffset' => 4,
+            ]],
             'labels' => $data->pluck('experience_level')->toArray(),
         ];
     }
@@ -85,7 +81,6 @@ class ExperienceChart extends ChartWidget
                     'displayColors'   => true,
                 ],
             ],
-            // ✅ Sembunyikan axis seperti CategoryDonutChart
             'scales' => [
                 'x' => ['display' => false],
                 'y' => ['display' => false],

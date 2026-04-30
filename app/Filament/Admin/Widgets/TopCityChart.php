@@ -20,6 +20,11 @@ class TopCityChart extends ChartWidget
             ->select('city', DB::raw('COUNT(*) as total'))
             ->whereNotNull('city')
             ->where('city', '!=', '')
+            // ✅ Fix data kotor
+            ->where('city', 'not like', '%full time%')
+            ->where('city', 'not like', '%part time%')
+            ->where('city', 'not like', '%This is%')
+            ->where('city', 'not like', '%job%')
             ->groupBy('city')
             ->orderByDesc('total')
             ->limit(10)
@@ -31,18 +36,16 @@ class TopCityChart extends ChartWidget
         ];
 
         return [
-            'datasets' => [
-                [
-                    'label'              => 'Jumlah Lowongan',
-                    'data'               => $data->pluck('total')->toArray(),
-                    'backgroundColor'    => array_slice($colors, 0, $data->count()),
-                    'borderWidth'        => 0,
-                    'borderRadius'       => 8,
-                    'borderSkipped'      => false,
-                    'barPercentage'      => 0.75,
-                    'categoryPercentage' => 0.85,
-                ],
-            ],
+            'datasets' => [[
+                'label'              => 'Jumlah Lowongan',
+                'data'               => $data->pluck('total')->toArray(),
+                'backgroundColor'    => array_slice($colors, 0, $data->count()),
+                'borderWidth'        => 0,
+                'borderRadius'       => 8,
+                'borderSkipped'      => false,
+                'barPercentage'      => 0.75,
+                'categoryPercentage' => 0.85,
+            ]],
             'labels' => $data->pluck('city')->toArray(),
         ];
     }
@@ -76,11 +79,8 @@ class TopCityChart extends ChartWidget
             'scales' => [
                 'x' => [
                     'beginAtZero' => true,
-                    'grid'        => [
-                        'color'   => 'rgba(255,255,255,0.04)',
-                        'display' => true,
-                    ],
-                    'ticks' => [
+                    'grid'        => ['color' => 'rgba(255,255,255,0.04)'],
+                    'ticks'       => [
                         'color'     => '#64748b',
                         'font'      => ['size' => 11],
                         'precision' => 0,
