@@ -11,7 +11,7 @@ class TopCompanyChart extends ChartWidget
     protected static ?string $description = 'Perusahaan dengan jumlah lowongan IT terbanyak';
     protected static ?int $sort = 2;
 
-    protected int | string | array $columnSpan = 'full';
+    protected int | string | array $columnSpan = '8';
     protected static ?string $maxHeight = '360px';
 
     protected function getData(): array
