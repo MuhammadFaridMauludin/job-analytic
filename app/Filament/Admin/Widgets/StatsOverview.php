@@ -42,7 +42,7 @@ class StatsOverview extends BaseWidget
             Stat::make('Total Lowongan IT', number_format($totalJobs))
                 ->description('dari platform nasional')
                 ->descriptionIcon('heroicon-m-arrow-trending-up')
-                ->color('info')
+                ->color('danger')
                 ->chart([4, 6, 5, 8, 7, 9, 12]),
 
             Stat::make('Perusahaan Aktif', number_format($totalCompanies))

@@ -16,22 +16,32 @@ class CategoryDonutChart extends ChartWidget
 
     protected function getData(): array
     {
-    $data = DB::table('jobs_clean')
-    ->select('keyword', DB::raw('COUNT(*) as total')) 
-    ->whereNotNull('keyword')
-    ->where('keyword', '!=', '')
-    ->groupBy('keyword')
-    ->orderByDesc('total')
-    ->limit(6)
-    ->get();
+        $data = DB::table('jobs_clean')
+            ->select('keyword', DB::raw('COUNT(*) as total'))
+            ->whereNotNull('keyword')
+            ->where('keyword', '!=', '')
+            ->groupBy('keyword')
+            ->orderByDesc('total')
+            ->limit(10)
+            ->get();
 
-        // Fallback
         if ($data->isEmpty()) {
             return [
                 'datasets' => [
                     [
                         'data'            => [32, 24, 18, 9, 7, 10],
-                        'backgroundColor' => ['#3b82f6','#8b5cf6','#10b981','#f59e0b','#f87171','#334155'],
+                        'backgroundColor' => [
+                        '#3b82f6', 
+                        '#8b5cf6', 
+                        '#10b981', 
+                        '#f59e0b', 
+                        '#f87171', 
+                        '#334155', 
+                        '#06b6d4', 
+                        '#ec4899',
+                        '#84cc16', 
+                        '#f97316', 
+                    ],
                         'borderWidth'     => 0,
                         'hoverOffset'     => 4,
                     ],
@@ -49,7 +59,7 @@ class CategoryDonutChart extends ChartWidget
                     'hoverOffset'     => 4,
                 ],
             ],
-            'labels' => $data->pluck('keyword')->toArray(),  // ← ganti category → keyword
+            'labels' => $data->pluck('keyword')->toArray(),
         ];
     }
 
@@ -72,6 +82,14 @@ class CategoryDonutChart extends ChartWidget
                         'font'            => ['size' => 10],
                         'padding'         => 10,
                     ],
+                ],
+            ],
+            'scales' => [
+                'x' => [
+                    'display' => false,
+                ],
+                'y' => [
+                    'display' => false,
                 ],
             ],
             'maintainAspectRatio' => false,

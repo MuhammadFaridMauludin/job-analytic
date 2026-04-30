@@ -12,7 +12,7 @@ class TopCompanyChart extends ChartWidget
     protected static ?int $sort = 2;
 
     protected int | string | array $columnSpan = '8';
-    protected static ?string $maxHeight = '360px';
+    protected static ?string $maxHeight = '380px';
 
     protected function getData(): array
     {
@@ -25,21 +25,22 @@ class TopCompanyChart extends ChartWidget
             ->limit(10)
             ->get();
 
-        $count  = $data->count();
-        $colors = collect(range(0, $count - 1))->map(function ($i) use ($count) {
-            $alpha = round(0.85 - ($i / $count) * 0.45, 2);
-            return "rgba(59, 130, 246, {$alpha})";
-        })->toArray();
+        $colors = [
+            '#3b82f6','#6366f1','#8b5cf6','#a855f7','#ec4899',
+            '#f43f5e','#f97316','#f59e0b','#10b981','#06b6d4',
+        ];
 
         return [
             'datasets' => [
                 [
-                    'label'           => 'Jumlah Lowongan',
-                    'data'            => $data->pluck('total')->toArray(),
-                    'backgroundColor' => $colors,
-                    'borderWidth'     => 0,
-                    'borderRadius'    => 4,
-                    'borderSkipped'   => false,
+                    'label'                => 'Jumlah Lowongan',
+                    'data'                 => $data->pluck('total')->toArray(),
+                    'backgroundColor'      => array_slice($colors, 0, $data->count()),
+                    'borderWidth'          => 0,
+                    'borderRadius'         => 8,
+                    'borderSkipped'        => false,
+                    'barPercentage'        => 0.75,
+                    'categoryPercentage'   => 0.85,
                 ],
             ],
             'labels' => $data->pluck('company')->toArray(),
@@ -52,29 +53,50 @@ class TopCompanyChart extends ChartWidget
     }
 
     protected function getOptions(): array
-    {
-        return [
-            'indexAxis' => 'y',
-            'plugins'   => [
-                'legend'  => ['display' => false],
-                'tooltip' => [
-                    'callbacks' => [
-                        'label' => "function(ctx){ return '  ' + ctx.parsed.x + ' lowongan'; }",
-                    ],
-                ],
+{
+    return [
+        'indexAxis'   => 'y',
+        'interaction' => [
+            'mode'      => 'nearest',
+            'intersect' => true,
+        ],
+        'plugins' => [
+            'legend'  => ['display' => false],
+            'tooltip' => [
+                'enabled'         => true,
+                'backgroundColor' => '#1e293b',
+                'titleColor'      => '#f1f5f9',
+                'bodyColor'       => '#94a3b8',
+                'borderColor'     => '#334155',
+                'borderWidth'     => 1,
+                'padding'         => 12,
+                'displayColors'   => true,
             ],
-            'scales' => [
-                'x' => [
-                    'beginAtZero' => true,
-                    'grid'        => ['color' => '#0f1724'],
-                    'ticks'       => ['color' => '#475569'],
+        ],
+        'scales' => [
+            'x' => [
+                'beginAtZero' => true,
+                'grid'        => [
+                    'color'   => 'rgba(255,255,255,0.04)',
+                    'display' => true,
                 ],
-                'y' => [
-                    'grid'  => ['display' => false],
-                    'ticks' => ['color' => '#94a3b8', 'font' => ['size' => 12]],
+                'ticks' => [
+                    'color'     => '#64748b',
+                    'font'      => ['size' => 11],
+                    'precision' => 0,
                 ],
+                'border' => ['display' => false],
             ],
-            'maintainAspectRatio' => false,
-        ];
-    }
+            'y' => [
+                'grid'   => ['display' => false],
+                'ticks'  => [
+                    'color' => '#e2e8f0',
+                    'font'  => ['size' => 12],
+                ],
+                'border' => ['display' => false],
+            ],
+        ],
+        'maintainAspectRatio' => false,
+    ];
+}
 }

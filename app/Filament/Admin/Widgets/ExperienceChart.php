@@ -11,8 +11,7 @@ class ExperienceChart extends ChartWidget
     protected static ?string $description = 'Proporsi lowongan berdasarkan level pengalaman';
     protected static ?int $sort = 4;
 
-    // Berdampingan dengan SalaryChart
-    protected int | string | array $columnSpan = 6;
+    protected int | string | array $columnSpan = 4;
     protected static ?string $maxHeight = '300px';
 
     protected function getData(): array
@@ -25,20 +24,30 @@ class ExperienceChart extends ChartWidget
             ->orderByDesc('total')
             ->get();
 
+        if ($data->isEmpty()) {
+            return [
+                'datasets' => [
+                    [
+                        'data'            => [40, 30, 20, 10],
+                        'backgroundColor' => ['#3b82f6','#8b5cf6','#10b981','#f59e0b'],
+                        'borderWidth'     => 0,
+                        'hoverOffset'     => 4,
+                    ],
+                ],
+                'labels' => ['Junior','Mid','Senior','Lead'],
+            ];
+        }
+
         return [
             'datasets' => [
                 [
                     'data'            => $data->pluck('total')->toArray(),
                     'backgroundColor' => [
-                        '#3b82f6',
-                        '#8b5cf6',
-                        '#10b981',
-                        '#f59e0b',
-                        '#f87171',
-                        '#334155',
+                        '#3b82f6','#8b5cf6','#10b981',
+                        '#f59e0b','#f87171','#334155',
                     ],
                     'borderWidth' => 0,
-                    'hoverOffset' => 6,
+                    'hoverOffset' => 4,
                 ],
             ],
             'labels' => $data->pluck('experience_level')->toArray(),
@@ -58,22 +67,28 @@ class ExperienceChart extends ChartWidget
                 'legend' => [
                     'position' => 'bottom',
                     'labels'   => [
-                        'padding'         => 14,
+                        'color'           => '#475569',
                         'usePointStyle'   => true,
                         'pointStyleWidth' => 8,
-                        'color'           => '#64748b',
-                        'font'            => ['size' => 11],
+                        'font'            => ['size' => 10],
+                        'padding'         => 10,
                     ],
                 ],
                 'tooltip' => [
-                    'callbacks' => [
-                        'label' => "function(ctx){
-                            var total = ctx.dataset.data.reduce(function(a,b){return a+b;},0);
-                            var pct = ((ctx.parsed / total)*100).toFixed(1);
-                            return '  ' + ctx.label + ': ' + ctx.formattedValue + ' (' + pct + '%)';
-                        }",
-                    ],
+                    'enabled'         => true,
+                    'backgroundColor' => '#1e293b',
+                    'titleColor'      => '#f1f5f9',
+                    'bodyColor'       => '#94a3b8',
+                    'borderColor'     => '#334155',
+                    'borderWidth'     => 1,
+                    'padding'         => 10,
+                    'displayColors'   => true,
                 ],
+            ],
+            // ✅ Sembunyikan axis seperti CategoryDonutChart
+            'scales' => [
+                'x' => ['display' => false],
+                'y' => ['display' => false],
             ],
             'maintainAspectRatio' => false,
         ];
